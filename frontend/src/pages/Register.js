@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
+
 const Register = () => {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
@@ -13,7 +14,8 @@ const Register = () => {
     e.preventDefault();
 
     try {
-      const response = await axios.post('http://127.0.0.1:8000/api/recommendations/register/', {
+
+      await axios.post('http://127.0.0.1:8000/api/recommendations/register/', {
         username,
         email,
         password,

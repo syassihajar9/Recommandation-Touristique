@@ -7,34 +7,44 @@ const Faq = () => {
   const [activites, setActivites] = useState("");
   const [climat, setClimat] = useState("");
   const [transport, setTransport] = useState("");
-  const [recommandation, setRecommandation] = useState("");
+  const [message, setMessage] = useState("");
 
-  // Fonction pour soumettre et générer les recommandations
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    let recommandations = [];
 
-    // Logique pour générer les recommandations en fonction des choix
-    if (lieu === "jardinMajorelle" && budget === "gratuit" && activites === "détente") {
-      recommandations.push("Nous vous recommandons de visiter le Jardin Majorelle pour un moment de détente en plein air.");
-    } else if (lieu === "palaisBahiya" && budget === "payant" && activites === "culturel") {
-      recommandations.push("Le Palais Bahia est une magnifique destination pour les passionnés d'histoire et d'architecture.");
-    } else if (lieu === "médina" && activites === "shopping") {
-      recommandations.push("La médina de Marrakech est idéale pour faire du shopping traditionnel. Vous y trouverez des produits faits main.");
+    const data = {
+      lieu: lieu,
+      budget: budget,
+      activite: activites,
+      climat: climat,
+      transport: transport
+    };
+    
+
+    try {
+      const response = await fetch("http://127.0.0.1:8000/api/recommendations/create-recommendation/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data)
+      });
+
+      if (response.ok) {
+        setMessage("✅ Recommandation enregistrée avec succès !");
+        // Réinitialiser le formulaire
+        setLieu("");
+        setBudget("");
+        setActivites("");
+        setClimat("");
+        setTransport("");
+      } else {
+        setMessage("❌ Erreur lors de l'enregistrement de la recommandation.");
+      }
+    } catch (error) {
+      console.error("Erreur:", error);
+      setMessage("❌ Erreur serveur !");
     }
-
-    if (climat === "chaud" && transport === "voiture") {
-      recommandations.push("Si vous aimez le climat chaud, nous vous recommandons de visiter les jardins et les palais en voiture pour plus de confort.");
-    } else if (climat === "frais" && transport === "à pied") {
-      recommandations.push("Un climat frais est idéal pour explorer la ville à pied, vous pouvez découvrir la médina et les ruelles anciennes.");
-    }
-
-    if (recommandations.length === 0) {
-      recommandations.push("Merci pour vos choix ! Nous avons d'autres options pour vous.");
-    }
-
-    // Mettre à jour l'état des recommandations
-    setRecommandation(recommandations.join(" "));
   };
 
   return (
@@ -42,6 +52,7 @@ const Faq = () => {
       <h1 className="text-center mb-4">FAQ & Recommandations Personnalisées</h1>
 
       <form onSubmit={handleSubmit}>
+        {/* Ton formulaire est parfait, je ne change rien ici */}
         <div className="mb-3">
           <label htmlFor="lieu" className="form-label">Quel type de lieu souhaitez-vous visiter ?</label>
           <select 
@@ -51,10 +62,10 @@ const Faq = () => {
             onChange={(e) => setLieu(e.target.value)}
           >
             <option value="">-- Choisir --</option>
-            <option value="jardinMajorelle">Jardin Majorelle</option>
-            <option value="palaisBahiya">Palais Bahia</option>
-            <option value="médina">La Médina</option>
-            <option value="placeJemaa">Place Jemaa el-Fna</option>
+            <option value="Jardin Majorelle">Jardin Majorelle</option>
+            <option value="Palais Bahia">Palais Bahia</option>
+            <option value="Médina">La Médina</option>
+            <option value="Place Jemaa el-Fna">Place Jemaa el-Fna</option>
           </select>
         </div>
 
@@ -114,16 +125,16 @@ const Faq = () => {
             <option value="">-- Choisir --</option>
             <option value="voiture">Voiture</option>
             <option value="transportPublic">Transport Public</option>
-            <option value="àPied">À pied</option>
+            <option value="à pied">À pied</option>
           </select>
         </div>
 
-        <button type="submit" className="btn btn-primary w-100 mt-4">Voir la recommandation</button>
+        <button type="submit" className="btn btn-primary w-100 mt-4">Envoyer la recommandation</button>
       </form>
 
-      {recommandation && (
+      {message && (
         <div className="mt-4 alert alert-info">
-          {recommandation}
+          {message}
         </div>
       )}
     </div>
